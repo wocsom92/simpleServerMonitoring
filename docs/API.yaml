@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: Simple server monitoring system - OpenAPI 3.0
+  description: Simple server monitoring system is used for monitoring of basic characteristics of the server
+  contact:
+    email: me@bednar.it
+  version: 1.0.0
+tags:
+  - name: heartbeat
+    description: Hearbeat related information
+  - name: usermanagement
+    description: Usermanagement for maintaining users which have access to monitored data
+  - name: resources
+    description: Resources related information
+  - name: info
+    description: Server information
+  - name: servermanagement
+    description: Servermanagement of server which are monitored
+servers:
+  - url: /v1
+    description: Version 1 of the API
+paths:
+  /getHeartbeat:
+    get:
+      tags:
+        - heartbeat
+      summary: Receive heartbeat
+      description: get heartbeat information
+      operationId: getHeartbeat
+      responses:
+        '200':
+          description: Successful operation
+  /getLastUpdateTimeStamp:
+    get:
+      tags:
+        - heartbeat
+      summary: Receive last update timestamp
+      description: Receive last update timestamp
+      operationId: getLastUpdateTimeStamp
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeStamp'
+  /login:
+    post:
+      tags:
+        - usermanagement
+      summary: send login information
+      description: send login information
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Successful operation
+  /createUser:
+    post:
+      tags:
+        - usermanagement
+      summary: createUser
+      description: createUser
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: User not found
+  /deleteUser/{userId}:    
+    delete:
+        tags:
+          - usermanagement
+        summary: Delete user by ID
+        operationId: deleteUser
+        parameters:
+          - name: userId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+        responses:
+          '400':
+            description: Invalid ID supplied
+          '404':
+            description: User not found
+  /getDiskOccupiedCapacity:
+    get:
+      tags:
+        - resources
+      summary: Receive disk capacity info
+      description:  Receive disk capacity info
+      operationId: getDiskOccupiedCapacity
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disk'
+  /getRamUsage:
+    get:
+      tags:
+        - resources
+      summary: Receive RAM usage info
+      description:  Receive RAM usage info
+      operationId: getRamUsage
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RAM'
+  /getLoadAverage:
+    get:
+      tags:
+        - resources
+      summary: Receive load Average info
+      description:  Receive load Average info
+      operationId: getLoadAverage
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadAverage'
+  /getServerDateTime:
+    get:
+      tags:
+        - info
+      summary: Receive datetime of the server
+      description:  Receive datetime of the server
+      operationId: getServerDateTime
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeStamp'
+  /getServerOSInfo:
+    get:
+      tags:
+        - info
+      summary: Receive OS related information
+      description:  Receive OS related information
+      operationId: getServerOSInfo
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OSInfo'
+  /getServers:
+   get:
+      tags:
+        - servermanagement
+      summary: Receive configured servers
+      description:  Receive Server related information
+      operationId: getServers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Server'
+  /addServer:
+    post:
+      tags:
+        - servermanagement
+      summary: createServer
+      description: createServer
+      operationId: createServer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+      responses:
+        '200':
+          description: Successful operation
+  /deleteServer/{serverId}:    
+    delete:
+        tags:
+          - servermanagement
+        summary: Delete server by ID
+        operationId: deleteServer
+        parameters:
+          - name: serverId
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+        responses:
+          '400':
+            description: Invalid ID supplied
+          '404':
+            description: Server not found
+components:
+  schemas:
+    TimeStamp:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          format: date-time
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'username'
+        password:
+          type: string
+          example: 'hashed password'
+    NewUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'username'
+        password:
+          type: string
+          example: 'hashed password'
+        role:
+          type: string
+          example: 'role'
+    Disk:
+      type: object
+      properties:
+        occupiedPercentage:
+          type: string
+          example: '50%'
+        capacity:
+          type: string
+          example: '1 TB'
+    RAM:
+      type: object
+      properties:
+        occupiedPercentage:
+          type: string
+          example: '50%'
+        capacity:
+          type: string
+          example: '1 TB'
+    LoadAverage:
+      type: object
+      properties:
+        1m:
+          type: number
+          format: double
+        5m:
+          type: number
+          format: double
+        15m:
+          type: number
+          format: double
+    OSInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Ubuntu'
+        osVersion: 
+          type: string
+          example: '22.04'
+        kernelVersion:
+          type: string
+          example: '6.1'
+    Server:
+      type: object
+      properties:
+        ip:
+          type: string
+          format: ipv4
+        port:
+          type: number
+          format: int32
+        path:
+          type: string
